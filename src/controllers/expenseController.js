@@ -1,7 +1,6 @@
 import { Expense } from "../models/Expense.js";
-import { ApiError } from "../utils/ApiError.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { normalizeExpensePayload } from "../middleware/validate.js";
+import { ApiError, asyncHandler } from "../utils.js";
+import { escapeRegExp, normalizeExpensePayload, parseQueryDate } from "../middleware/validate.js";
 
 export const createExpense = asyncHandler(async (req, res) => {
   const payload = normalizeExpensePayload(req.body);
@@ -35,23 +34,32 @@ export const getExpenses = asyncHandler(async (req, res) => {
     query.tags = tag;
   }
   if (search) {
+    const safeSearch = escapeRegExp(search).slice(0, 100);
     query.$or = [
-      { description: { $regex: search, $options: "i" } },
-      { notes: { $regex: search, $options: "i" } }
+      { description: { $regex: safeSearch, $options: "i" } },
+      { notes: { $regex: safeSearch, $options: "i" } }
     ];
   }
   if (startDate || endDate) {
     query.date = {};
     if (startDate) {
-      query.date.$gte = new Date(startDate);
+      const parsedStartDate = parseQueryDate(startDate, "Start date");
+      query.date.$gte = parsedStartDate;
     }
     if (endDate) {
-      query.date.$lte = new Date(endDate);
+      const parsedEndDate = parseQueryDate(endDate, "End date", { endOfDay: true });
+      query.date.$lte = parsedEndDate;
+    }
+    if (query.date.$gte && query.date.$lte && query.date.$gte > query.date.$lte) {
+      throw new ApiError(400, "Start date cannot be after end date");
     }
   }
 
-  const pageNumber = Number(page) || 1;
-  const pageSize = Math.min(Number(limit) || 10, 50);
+  const pageNumber = Number(page);
+  const requestedPageSize = Number(limit);
+  if (!Number.isInteger(pageNumber) || pageNumber < 1) throw new ApiError(400, "Page must be a positive integer");
+  if (!Number.isInteger(requestedPageSize) || requestedPageSize < 1) throw new ApiError(400, "Limit must be a positive integer");
+  const pageSize = Math.min(requestedPageSize, 50);
   const allowedSortFields = ["date", "amount", "category", "created_at"];
   const sortField = allowedSortFields.includes(sortBy) ? sortBy : "date";
   const sortDirection = order === "asc" ? 1 : -1;
@@ -77,16 +85,28 @@ export const getExpenses = asyncHandler(async (req, res) => {
 });
 
 export const updateExpense = asyncHandler(async (req, res) => {
-  const payload = normalizeExpensePayload(req.body);
+  const payload = normalizeExpensePayload(req.body, { partial: req.method === "PATCH" });
+  const currentExpense = await Expense.findOne({
+    _id: req.params.id,
+    user_id: req.user.user_id
+  }).lean();
+  if (!currentExpense) throw new ApiError(404, "Expense not found");
+
+  if (Object.hasOwn(req.body, "necessityType") || Object.hasOwn(req.body, "amount")) {
+    const necessityType = payload.necessityType || currentExpense.necessityType || "uncategorized";
+    const amount = payload.amount ?? currentExpense.amount;
+    const savingsRate = { needs: 0, wants: 0.5, luxury: 0.8, uncategorized: 0 }[necessityType];
+    payload.potentialSavings = Number((amount * savingsRate).toFixed(2));
+  }
+  if (Object.hasOwn(req.body, "category") || Object.hasOwn(req.body, "necessityType")) {
+    payload.classificationSource = "user_review";
+  }
+
   const expense = await Expense.findOneAndUpdate(
     { _id: req.params.id, user_id: req.user.user_id },
     payload,
     { new: true, runValidators: true }
   );
-
-  if (!expense) {
-    throw new ApiError(404, "Expense not found");
-  }
 
   res.json(expense);
 });

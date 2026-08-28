@@ -68,12 +68,26 @@ const userSchema = new mongoose.Schema(
         type: Boolean,
         default: true
       }
+    },
+    inflation_profile: {
+      inflationRate: {
+        type: Number,
+        default: 6,
+        min: 0,
+        max: 30
+      },
+      expectedReturn: {
+        type: Number,
+        default: 10,
+        min: 0,
+        max: 50
+      }
     }
   },
   {
     timestamps: {
       createdAt: "created_at",
-      updatedAt: false
+      updatedAt: "updated_at"
     },
     versionKey: false
   }

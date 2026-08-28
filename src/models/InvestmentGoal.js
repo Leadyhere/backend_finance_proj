@@ -62,4 +62,6 @@ const investmentGoalSchema = new mongoose.Schema(
   }
 );
 
+investmentGoalSchema.index({ user_id: 1, status: 1, targetDate: 1 });
+
 export const InvestmentGoal = mongoose.model("InvestmentGoal", investmentGoalSchema);

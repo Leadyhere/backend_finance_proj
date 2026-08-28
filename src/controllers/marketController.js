@@ -1,5 +1,5 @@
 import { getMarketOverviewSnapshot } from "../services/marketService.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils.js";
 
 export const getMarketOverview = asyncHandler(async (_req, res) => {
   const overview = await getMarketOverviewSnapshot();

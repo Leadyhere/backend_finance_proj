@@ -1,7 +1,6 @@
 import { Loan } from "../models/Loan.js";
 import { normalizeLoanPayload } from "../middleware/validate.js";
-import { ApiError } from "../utils/ApiError.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError, asyncHandler } from "../utils.js";
 
 export const createLoan = asyncHandler(async (req, res) => {
   const payload = normalizeLoanPayload(req.body);
@@ -25,7 +24,7 @@ export const getLoans = asyncHandler(async (req, res) => {
 });
 
 export const updateLoan = asyncHandler(async (req, res) => {
-  const payload = normalizeLoanPayload(req.body);
+  const payload = normalizeLoanPayload(req.body, { partial: req.method === "PATCH" });
   const loan = await Loan.findOneAndUpdate(
     { _id: req.params.id, user_id: req.user.user_id },
     payload,

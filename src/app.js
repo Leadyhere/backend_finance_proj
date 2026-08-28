@@ -1,32 +1,51 @@
 import compression from "compression";
 import express from "express";
-import morgan from "morgan";
-import authRoutes from "./routes/authRoutes.js";
-import expenseRoutes from "./routes/expenseRoutes.js";
-import budgetRoutes from "./routes/budgetRoutes.js";
-import dashboardRoutes from "./routes/dashboardRoutes.js";
-import goalRoutes from "./routes/goalRoutes.js";
-import investmentRoutes from "./routes/investmentRoutes.js";
-import loanRoutes from "./routes/loanRoutes.js";
-import marketRoutes from "./routes/marketRoutes.js";
-import profileRoutes from "./routes/profileRoutes.js";
-import summaryRoutes from "./routes/summaryRoutes.js";
-import { apiLimiter } from "./middleware/rateLimiter.js";
-import { securityMiddleware } from "./middleware/securityMiddleware.js";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import swaggerUi from "swagger-ui-express";
+import apiRoutes from "./routes.js";
+import { createDemoSession } from "./controllers/authController.js";
+import { apiLimiter, demoSessionLimiter } from "./middleware/rateLimiter.js";
+import { sanitizeRequest, securityMiddleware } from "./middleware/securityMiddleware.js";
 import { authenticate } from "./middleware/authMiddleware.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import { getDatabaseHealth } from "./config/db.js";
+import { requestLogger } from "./middleware/requestLogger.js";
+import { openApiSpec } from "./docs/openapi.js";
+
+const publicDirectory = fileURLToPath(new URL("../public/", import.meta.url));
+const applicationHtml = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
 
 export const createApp = () => {
   const app = express();
 
   app.disable("x-powered-by");
   app.set("trust proxy", 1);
+  app.use(requestLogger);
   app.use(securityMiddleware);
   app.use(apiLimiter);
   app.use(compression());
   app.use(express.json({ limit: "1mb" }));
-  app.use(morgan("dev"));
+  app.use(sanitizeRequest);
+  app.use(express.static(publicDirectory, { index: false, maxAge: "1d" }));
+
+  app.get("/", (req, res) => {
+    const origin = `${req.protocol}://${req.get("host")}`;
+    res.setHeader("Cache-Control", "no-store");
+    res.type("html").send(applicationHtml.replaceAll("__APP_ORIGIN__", origin));
+  });
+  app.get("/api", (_req, res) => {
+    res.json({
+      name: "Kosha Financial Intelligence API",
+      version: "3.0.0",
+      status: "running",
+      application: "/",
+      documentation: "/docs",
+      openapi: "/openapi.json"
+    });
+  });
+  app.get("/openapi.json", (_req, res) => res.json(openApiSpec));
+  app.use("/docs", swaggerUi.serve, swaggerUi.setup(openApiSpec, { customSiteTitle: "Finance API Docs" }));
 
   app.get("/health", async (_req, res) => {
     const db = await getDatabaseHealth();
@@ -49,17 +68,9 @@ export const createApp = () => {
     });
   });
 
+  app.post("/auth/demo", demoSessionLimiter, createDemoSession);
   app.use(authenticate);
-  app.use("/auth", authRoutes);
-  app.use("/profile", profileRoutes);
-  app.use("/expenses", expenseRoutes);
-  app.use("/budget", budgetRoutes);
-  app.use("/goals", goalRoutes);
-  app.use("/investments", investmentRoutes);
-  app.use("/loans", loanRoutes);
-  app.use("/market-overview", marketRoutes);
-  app.use("/dashboard", dashboardRoutes);
-  app.use("/finance-summary", summaryRoutes);
+  app.use(apiRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

@@ -1,7 +1,6 @@
 import { InvestmentGoal } from "../models/InvestmentGoal.js";
 import { normalizeGoalPayload } from "../middleware/validate.js";
-import { ApiError } from "../utils/ApiError.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError, asyncHandler } from "../utils.js";
 
 export const createGoal = asyncHandler(async (req, res) => {
   const payload = normalizeGoalPayload(req.body);
@@ -25,7 +24,7 @@ export const getGoals = asyncHandler(async (req, res) => {
 });
 
 export const updateGoal = asyncHandler(async (req, res) => {
-  const payload = normalizeGoalPayload(req.body);
+  const payload = normalizeGoalPayload(req.body, { partial: req.method === "PATCH" });
   const goal = await InvestmentGoal.findOneAndUpdate(
     { _id: req.params.id, user_id: req.user.user_id },
     payload,

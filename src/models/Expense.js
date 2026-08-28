@@ -37,6 +37,31 @@ const expenseSchema = new mongoose.Schema(
     recurring: {
       type: Boolean,
       default: false
+    },
+    merchant: {
+      type: String,
+      default: ""
+    },
+    necessityType: {
+      type: String,
+      enum: ["needs", "wants", "luxury", "uncategorized"],
+      default: "uncategorized",
+      index: true
+    },
+    classificationSource: {
+      type: String,
+      enum: ["manual", "screenshot_rule", "screenshot_ai", "user_review"],
+      default: "manual"
+    },
+    potentialSavings: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    import_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ExpenseImport",
+      default: null
     }
   },
   {
@@ -47,5 +72,9 @@ const expenseSchema = new mongoose.Schema(
     versionKey: false
   }
 );
+
+expenseSchema.index({ user_id: 1, date: -1 });
+expenseSchema.index({ user_id: 1, category: 1, date: -1 });
+expenseSchema.index({ user_id: 1, necessityType: 1, date: -1 });
 
 export const Expense = mongoose.model("Expense", expenseSchema);

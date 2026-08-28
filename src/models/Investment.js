@@ -62,4 +62,7 @@ const investmentSchema = new mongoose.Schema(
   }
 );
 
+investmentSchema.index({ user_id: 1, currentValue: -1 });
+investmentSchema.index({ user_id: 1, assetType: 1 });
+
 export const Investment = mongoose.model("Investment", investmentSchema);

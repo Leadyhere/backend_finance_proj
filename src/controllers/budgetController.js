@@ -1,5 +1,5 @@
 import { Budget } from "../models/Budget.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils.js";
 import { normalizeBudgetPayload } from "../middleware/validate.js";
 
 export const createBudget = asyncHandler(async (req, res) => {

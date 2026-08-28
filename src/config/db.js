@@ -1,17 +1,18 @@
 import mongoose from "mongoose";
 import { env } from "./env.js";
+import { logger } from "./logger.js";
 
 export const connectDatabase = async () => {
   mongoose.connection.on("connected", () => {
-    console.log("MongoDB connected");
+    logger.info("MongoDB connected");
   });
 
   mongoose.connection.on("error", (error) => {
-    console.error("MongoDB connection error", error);
+    logger.error({ err: error }, "MongoDB connection error");
   });
 
   mongoose.connection.on("disconnected", () => {
-    console.warn("MongoDB disconnected");
+    logger.warn("MongoDB disconnected");
   });
 
   await mongoose.connect(env.dbUri, {

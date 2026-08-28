@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: personal-finance-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /ready
+    autoDeployTrigger: checksPass
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: PORT
+        value: 5001
+      - key: JWT_SECRET
+        sync: false
+      - key: DB_URI
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: MARKET_DATA_API_KEY
+        sync: false
+      - key: MARKET_FEED_MODE
+        value: demo
+      - key: DEMO_MODE
+        value: true

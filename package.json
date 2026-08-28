@@ -1,13 +1,20 @@
 {
   "name": "finance-module-backend",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "build": "npm run check",
+    "check": "node scripts/check-syntax.js",
+    "test": "node --test --test-concurrency=1",
+    "test:watch": "node --test --watch --test-concurrency=1",
+    "seed": "node scripts/seed.js",
+    "migrate": "node scripts/migrate.js"
   },
   "dependencies": {
+    "@sentry/node": "^10.0.0",
     "compression": "^1.7.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -17,10 +24,15 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.1",
-    "morgan": "^1.10.0",
+    "multer": "^2.0.0",
+    "pino": "^9.0.0",
+    "pino-http": "^10.0.0",
+    "swagger-ui-express": "^5.0.1",
     "validator": "^13.12.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.2"
+    "mongodb-memory-server": "^10.0.0",
+    "nodemon": "^3.1.2",
+    "supertest": "^7.0.0"
   }
 }

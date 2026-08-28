@@ -1,7 +1,6 @@
 import { Investment } from "../models/Investment.js";
 import { normalizeInvestmentPayload } from "../middleware/validate.js";
-import { ApiError } from "../utils/ApiError.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError, asyncHandler } from "../utils.js";
 
 export const createInvestment = asyncHandler(async (req, res) => {
   const payload = normalizeInvestmentPayload(req.body);
@@ -25,7 +24,7 @@ export const getInvestments = asyncHandler(async (req, res) => {
 });
 
 export const updateInvestment = asyncHandler(async (req, res) => {
-  const payload = normalizeInvestmentPayload(req.body);
+  const payload = normalizeInvestmentPayload(req.body, { partial: req.method === "PATCH" });
   const investment = await Investment.findOneAndUpdate(
     { _id: req.params.id, user_id: req.user.user_id },
     payload,

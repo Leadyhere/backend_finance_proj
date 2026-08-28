@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kosha turns your complete financial picture into clear, prioritized actions.">
+  <meta name="theme-color" content="#102a25">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Kosha — Personal Financial Intelligence">
+  <meta property="og:description" content="Make every rupee move with purpose through explainable whole-picture financial guidance.">
+  <meta property="og:url" content="__APP_ORIGIN__/">
+  <meta property="og:image" content="__APP_ORIGIN__/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kosha — Personal Financial Intelligence">
+  <meta name="twitter:description" content="Make every rupee move with purpose through explainable whole-picture financial guidance.">
+  <meta name="twitter:image" content="__APP_ORIGIN__/og.png">
+  <title>Kosha — Personal Financial Intelligence</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="auth-gate" id="authGate">
+    <div class="auth-brand" aria-hidden="true">
+      <span class="brand-mark">K</span>
+      <span>Kosha</span>
+    </div>
+    <section class="auth-copy">
+      <p class="eyebrow">Your finances, finally in focus</p>
+      <h1>Make every rupee<br>move with purpose.</h1>
+      <p class="auth-lede">One calm workspace for cash flow, spending, debt, goals, investments, and a prioritized financial action plan.</p>
+      <div class="auth-proof">
+        <span><b>6</b> health dimensions</span>
+        <span><b>100%</b> explainable guidance</span>
+        <span><b>0</b> trades executed</span>
+      </div>
+    </section>
+    <section class="access-card" aria-labelledby="accessTitle">
+      <p class="eyebrow">Interactive portfolio demo</p>
+      <h2 id="accessTitle">See the complete experience</h2>
+      <p>Explore a realistic sample household with expenses, goals, debt, and investments already connected.</p>
+      <button class="button primary wide" id="demoButton">Explore demo dashboard <span aria-hidden="true">→</span></button>
+      <div class="separator"><span>or use your API token</span></div>
+      <form id="tokenForm">
+        <label for="tokenInput">Bearer token</label>
+        <div class="token-row">
+          <input id="tokenInput" name="token" type="password" autocomplete="off" placeholder="Paste a valid JWT" required>
+          <button class="button secondary" type="submit">Connect</button>
+        </div>
+      </form>
+      <p class="fine-print">Demo access is isolated to sample records. Guidance is educational, not regulated financial advice.</p>
+    </section>
+  </div>
+
+  <div class="app-shell" id="appShell" hidden>
+    <aside class="sidebar">
+      <a class="brand" href="#overview" aria-label="Kosha home"><span class="brand-mark">K</span><span>Kosha</span></a>
+      <nav class="nav" aria-label="Primary navigation">
+        <button class="nav-item active" data-view="overview"><span class="nav-icon">◫</span>Overview</button>
+        <button class="nav-item" data-view="advisor"><span class="nav-icon">✦</span>Advisor</button>
+        <button class="nav-item" data-view="inflation"><span class="nav-icon">%</span>Inflation</button>
+        <button class="nav-item" data-view="expenses"><span class="nav-icon">↗</span>Spending</button>
+        <button class="nav-item" data-view="portfolio"><span class="nav-icon">◎</span>Portfolio</button>
+        <button class="nav-item" data-view="setup"><span class="nav-icon">＋</span>Financial setup</button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="profile-chip"><span class="avatar" id="avatar">AM</span><span><b id="sidebarName">Your profile</b><small id="sidebarEmail">Connected</small></span></div>
+        <button class="text-button" id="signOutButton">Sign out</button>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="todayLabel"></p>
+          <h2 id="viewTitle">Financial overview</h2>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-button" id="newsletterButton" aria-label="Open daily briefing"><span>◌</span><i id="unreadDot"></i></button>
+          <button class="button secondary compact" id="refreshButton">Refresh</button>
+          <button class="button primary compact" data-open-form="expense">Add expense</button>
+        </div>
+      </header>
+
+      <section class="view active" data-view-panel="overview">
+        <div class="hero-grid">
+          <article class="health-hero card dark-card">
+            <div>
+              <p class="eyebrow light">Financial health</p>
+              <h3 id="healthHeadline">Building your assessment…</h3>
+              <p id="healthSummary">Connecting cash flow, safety, debt, spending, goals, and portfolio alignment.</p>
+              <button class="button light" data-go-view="advisor">View action plan <span>→</span></button>
+            </div>
+            <div class="score-ring" id="scoreRing" style="--score:0"><span><b id="healthScore">—</b><small>/ 100</small></span></div>
+          </article>
+          <article class="next-action card" id="nextActionCard">
+            <div class="card-heading"><span class="signal urgent">Priority</span><span id="actionCategory">Assessment</span></div>
+            <h3 id="actionTitle">Preparing your next best action</h3>
+            <p id="actionText">Your most important recommendation will appear here.</p>
+            <button class="text-link" data-go-view="advisor">See why this matters →</button>
+          </article>
+        </div>
+
+        <div class="metrics-grid" id="metricsGrid">
+          <article class="metric card"><span>Net worth</span><strong data-metric="netWorth">—</strong><small>Assets minus active debt</small></article>
+          <article class="metric card"><span>Monthly surplus</span><strong data-metric="surplus">—</strong><small data-metric-note="surplus">After spending and EMIs</small></article>
+          <article class="metric card"><span>Portfolio value</span><strong data-metric="portfolio">—</strong><small data-metric-note="portfolio">Current recorded value</small></article>
+          <article class="metric card"><span>Possible savings</span><strong data-metric="savings">—</strong><small>From wants and luxury spend</small></article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="card span-2">
+            <div class="card-heading"><div><p class="eyebrow">Cash-flow rhythm</p><h3>Six-month spending</h3></div><span class="muted">Monthly total</span></div>
+            <div class="bar-chart" id="monthlyChart" aria-label="Six-month expense chart"></div>
+          </article>
+          <article class="card">
+            <div class="card-heading"><div><p class="eyebrow">Spending mix</p><h3>Needs vs choices</h3></div><button class="text-link" data-go-view="expenses">Details</button></div>
+            <div class="donut-wrap"><div class="donut" id="spendingDonut"><span><b id="donutTotal">—</b><small>this month</small></span></div><div class="legend" id="spendingLegend"></div></div>
+          </article>
+          <article class="card span-2">
+            <div class="card-heading"><div><p class="eyebrow">Latest activity</p><h3>Recent expenses</h3></div><button class="text-link" data-go-view="expenses">View all →</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Expense</th><th>Type</th><th>Date</th><th class="numeric">Amount</th></tr></thead><tbody id="recentExpenses"></tbody></table></div>
+          </article>
+          <article class="card">
+            <div class="card-heading"><div><p class="eyebrow">Goal momentum</p><h3>Active goals</h3></div></div>
+            <div class="goal-list" id="goalList"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" data-view-panel="advisor">
+        <div class="section-intro"><div><p class="eyebrow">Whole-picture guidance</p><h1>Your financial action plan</h1><p>Prioritized from your income, actual spending, safety reserve, debts, goals, and current investments.</p></div><div class="completeness"><span>Data completeness</span><strong id="completenessValue">—</strong><div class="progress"><i id="completenessBar"></i></div></div></div>
+        <div class="advisor-layout">
+          <div>
+            <div class="dimension-grid" id="dimensionGrid"></div>
+            <article class="card action-panel"><div class="card-heading"><div><p class="eyebrow">Recommended sequence</p><h3>What to do next</h3></div><span class="muted">Highest impact first</span></div><div class="action-list" id="actionList"></div></article>
+          </div>
+          <aside>
+            <article class="card snapshot-card"><p class="eyebrow">Advisor snapshot</p><h3>Your monthly picture</h3><dl id="advisorSnapshot"></dl></article>
+            <article class="card ai-insight-card"><p class="eyebrow">Grok explanation</p><h3>Make the plan easier to act on</h3><p id="aiInsightSummary">Grok can explain your calculated action plan in plain language without changing its numbers.</p><div id="aiInsightPriorities"></div><button class="button primary wide" id="aiInsightButton" type="button">Generate with Grok</button><small>Your financial snapshot is sent securely to xAI; your API key stays on the server.</small></article>
+            <article class="card disclosure"><b>How this works</b><p>Every suggestion is produced by transparent rules. Kosha never executes a transaction and never changes your long-term plan because of one headline.</p></article>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" data-view-panel="expenses">
+        <div class="section-intro"><div><p class="eyebrow">Spending intelligence</p><h1>Know where your money went</h1><p>Upload a daily spending screenshot or add an expense manually. Categories are assigned automatically and remain editable.</p></div><button class="button primary" data-open-form="expense">Add manually</button></div>
+        <div class="expenses-layout">
+          <article class="upload-card card" id="uploadCard">
+            <input type="file" id="screenshotInput" accept="image/png,image/jpeg" hidden>
+            <div class="upload-symbol">⇧</div><h3>Drop a spending screenshot</h3><p>PNG or JPEG up to 8 MB. Grok extracts and classifies transactions; Kosha stores only the resulting expense records.</p><button class="button secondary" id="browseButton" type="button">Choose screenshot</button><small>No category question—classification is automatic and remains editable afterward.</small>
+          </article>
+          <article class="card savings-card"><p class="eyebrow">Savings opportunity</p><strong id="monthlyPotential">—</strong><span>possible this month</span><hr><div><span>Annualized estimate</span><b id="annualPotential">—</b></div><div><span>Investment-journey total</span><b id="journeyPotential">—</b></div></article>
+        </div>
+        <article class="card expense-table-card"><div class="card-heading"><div><p class="eyebrow">Expense history</p><h3>Recent transactions</h3></div><label class="search-field"><span>⌕</span><input id="expenseSearch" type="search" placeholder="Search expenses"></label></div><div class="table-wrap"><table><thead><tr><th>Description</th><th>Classification</th><th>Date</th><th class="numeric">Amount</th><th></th></tr></thead><tbody id="expenseTable"></tbody></table></div></article>
+      </section>
+
+      <section class="view" data-view-panel="portfolio">
+        <div class="section-intro"><div><p class="eyebrow">Portfolio intelligence</p><h1>Target versus today</h1><p>Use new contributions to close material allocation gaps while protecting near-term liquidity.</p></div><button class="button primary" id="questionnaireButton">Update risk profile</button></div>
+        <div class="portfolio-layout">
+          <article class="card"><div class="card-heading"><div><p class="eyebrow">Allocation comparison</p><h3>Current and recommended</h3></div><span class="risk-pill" id="riskPill">Not assessed</span></div><div class="allocation-list" id="allocationList"></div></article>
+          <article class="card"><div class="card-heading"><div><p class="eyebrow">Holdings</p><h3>Top investments</h3></div><button class="text-link" data-open-form="investment">Add</button></div><div class="holding-list" id="holdingList"></div></article>
+        </div>
+      </section>
+
+      <section class="view" data-view-panel="inflation">
+        <div class="section-intro"><div><p class="eyebrow">Purchasing-power planning</p><h1>Inflation calculator</h1><p>See what today’s goal may cost later, what today’s money may buy, and a monthly investment estimate using your own assumptions.</p></div></div>
+        <div class="inflation-layout">
+          <form class="card inflation-form" id="inflationForm">
+            <div class="card-heading"><div><p class="eyebrow">Your assumptions</p><h3>Project a future goal</h3></div></div>
+            <div class="form-grid static-form">
+              <div class="form-field"><label for="inflationAmount">Amount in today’s money</label><input id="inflationAmount" name="currentAmount" type="number" min="1" step="0.01" value="100000" required></div>
+              <div class="form-field"><label for="inflationYears">Years from now</label><input id="inflationYears" name="years" type="number" min="1" max="60" value="10" required></div>
+              <div class="form-field"><label for="inflationRate">Expected inflation (%)</label><input id="inflationRate" name="inflationRate" type="number" min="0" max="30" step="0.1" value="6" required></div>
+              <div class="form-field"><label for="expectedReturn">Expected annual return (%)</label><input id="expectedReturn" name="expectedReturn" type="number" min="0" max="50" step="0.1" value="10" required></div>
+            </div>
+            <button class="button primary" id="inflationButton" type="submit">Calculate and save assumptions</button>
+          </form>
+          <article class="card inflation-results" aria-live="polite">
+            <p class="eyebrow">Projection</p><h3 id="inflationResultTitle">Enter your goal assumptions</h3>
+            <div class="result-grid">
+              <div><span>Future cost</span><strong id="futureCost">—</strong></div>
+              <div><span>Purchasing power</span><strong id="purchasingPower">—</strong></div>
+              <div><span>Monthly investment</span><strong id="monthlyInvestment">—</strong></div>
+              <div><span>Real expected return</span><strong id="realReturn">—</strong></div>
+            </div>
+            <p class="inflation-note" id="inflationNote">Fixed-rate projections are educational estimates, not guaranteed outcomes.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" data-view-panel="setup">
+        <div class="section-intro"><div><p class="eyebrow">Complete the picture</p><h1>Financial setup</h1><p>Better inputs create better suggestions. Add or update each part of your financial life.</p></div></div>
+        <div class="setup-grid">
+          <button class="setup-card card" data-open-form="profile"><span>01</span><h3>Income & profile</h3><p>Income, savings target, risk style, and location.</p><b>Update profile →</b></button>
+          <button class="setup-card card" data-open-form="budget"><span>02</span><h3>Monthly budget</h3><p>Set the overall spending ceiling and warning threshold.</p><b>Set budget →</b></button>
+          <button class="setup-card card" data-open-form="investment"><span>03</span><h3>Investments</h3><p>Add mutual funds, liquid assets, land, gold, or other holdings.</p><b>Add investment →</b></button>
+          <button class="setup-card card" data-open-form="loan"><span>04</span><h3>Loans & EMIs</h3><p>Record balances, rates, repayment amounts, and due dates.</p><b>Add loan →</b></button>
+          <button class="setup-card card" data-open-form="goal"><span>05</span><h3>Financial goals</h3><p>Track target amount, progress, contribution, and deadline.</p><b>Add goal →</b></button>
+          <button class="setup-card card featured" data-open-form="questionnaire"><span>06</span><h3>Advisor questionnaire</h3><p>Define liquidity, protection, horizon, and investment capacity.</p><b>Build allocation →</b></button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="modal" id="formDialog"><form class="modal-shell" id="recordForm"><header><div><p class="eyebrow" id="formEyebrow">Financial record</p><h2 id="formTitle">Add information</h2></div><button class="close-button" id="formCloseButton" type="button" aria-label="Close">×</button></header><div class="form-grid" id="formFields"></div><footer><button class="button secondary" id="formCancelButton" type="button">Cancel</button><button class="button primary" id="formSubmit" type="submit">Save changes</button></footer></form></dialog>
+  <dialog class="modal briefing-modal" id="newsletterDialog"><div class="modal-shell"><header><div><p class="eyebrow">Daily briefing</p><h2 id="briefingTitle">Portfolio briefing</h2></div><button class="close-button" id="closeBriefing" type="button" aria-label="Close">×</button></header><p class="briefing-summary" id="briefingSummary"></p><div class="flag-list" id="briefingFlags"></div><div class="headline-list" id="briefingHeadlines"></div><p class="fine-print" id="briefingDisclaimer"></p><footer><button class="button primary" id="markReadButton" type="button">Mark as read</button></footer></div></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

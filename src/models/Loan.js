@@ -66,4 +66,6 @@ const loanSchema = new mongoose.Schema(
   }
 );
 
+loanSchema.index({ user_id: 1, status: 1, nextDueDate: 1 });
+
 export const Loan = mongoose.model("Loan", loanSchema);
